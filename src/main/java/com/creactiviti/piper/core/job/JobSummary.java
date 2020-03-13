@@ -71,7 +71,7 @@ public class JobSummary {
     return job.getOutputs();
   }
 
-  public List<Accessor> getWebhooks() {
+  public List<Webhook> getWebhooks() {
     return job.getWebhooks();
   }
 

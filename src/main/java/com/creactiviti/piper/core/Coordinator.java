@@ -15,10 +15,10 @@
  */
 package com.creactiviti.piper.core;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -38,6 +38,8 @@ import com.creactiviti.piper.core.job.Job;
 import com.creactiviti.piper.core.job.JobRepository;
 import com.creactiviti.piper.core.job.JobStatus;
 import com.creactiviti.piper.core.job.SimpleJob;
+import com.creactiviti.piper.core.job.Webhook;
+import com.creactiviti.piper.core.job.WebhookInput;
 import com.creactiviti.piper.core.messagebroker.MessageBroker;
 import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.pipeline.Pipeline;
@@ -96,10 +98,13 @@ public class Coordinator {
 
     validate (jobParams, pipeline);
     
-    MapObject inputs = MapObject.of(jobParams.getMap(INPUTS,Collections.EMPTY_MAP));
-    List<Accessor> webhooks = jobParams.getList(WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
-    List<String> tags = (List<String>) aJobParams.get(TAGS);
-
+    MapObject inputs = MapObject.of(jobParams.getMap(INPUTS,Map.of()));
+    
+    List<Webhook> webhooks = jobParams.getList(WEBHOOKS, MapObject.class, List.of())
+                                      .stream()
+                                      .map(WebhookInput::new)
+                                      .collect(Collectors.toList());
+    
     SimpleJob job = new SimpleJob();
     job.setId(UUIDGenerator.generate());
     job.setLabel(jobParams.getString(DSL.LABEL,pipeline.getLabel()));
@@ -108,12 +113,12 @@ public class Coordinator {
     job.setStatus(JobStatus.CREATED);
     job.setCreateTime(new Date());
     job.setParentTaskExecutionId((String)aJobParams.get(DSL.PARENT_TASK_EXECUTION_ID));
-    job.setWebhooks(webhooks!=null?webhooks:Collections.EMPTY_LIST);
+    job.setWebhooks(webhooks!=null?webhooks:List.of());
     job.setInputs(inputs);
     log.debug("Job {} started",job.getId());
     jobRepository.create(job);
     
-    MapContext context = new MapContext(jobParams.getMap(INPUTS,Collections.EMPTY_MAP));
+    MapContext context = new MapContext(jobParams.getMap(INPUTS,Map.of()));
     contextRepository.push(job.getId(),context);
     
     eventPublisher.publishEvent(PiperEvent.of(Events.JOB_STATUS,"jobId",job.getId(),"status",job.getStatus()));
@@ -135,7 +140,7 @@ public class Coordinator {
   
   private void validate (MapObject aCreateJobParams, Pipeline aPipeline) {
     // validate inputs
-    Map<String, Object> inputs = aCreateJobParams.getMap(DSL.INPUTS,Collections.EMPTY_MAP);
+    Map<String, Object> inputs = aCreateJobParams.getMap(DSL.INPUTS,Map.of());
     List<Accessor> input = aPipeline.getInputs();
     for(Accessor in : input) {
       if(in.getBoolean(DSL.REQUIRED, false)) {
@@ -143,7 +148,7 @@ public class Coordinator {
       }
     }
     // validate webhooks
-    List<Accessor> webhooks = aCreateJobParams.getList(WEBHOOKS, MapObject.class, Collections.EMPTY_LIST);
+    List<Accessor> webhooks = aCreateJobParams.getList(WEBHOOKS, Accessor.class, List.of());
     for(Accessor webhook : webhooks) {
       Assert.notNull(webhook.getString(DSL.TYPE), "must define 'type' on webhook");
       Assert.notNull(webhook.getString(DSL.URL), "must define 'url' on webhook");

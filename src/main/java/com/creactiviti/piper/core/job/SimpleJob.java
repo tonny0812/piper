@@ -178,11 +178,11 @@ public class SimpleJob extends MapObject implements Job {
   }
   
   @Override
-  public List<Accessor> getWebhooks() {
-    return getList(DSL.WEBHOOKS, Accessor.class, Collections.emptyList());
+  public List<Webhook> getWebhooks() {
+    return getList(DSL.WEBHOOKS, Webhook.class, Collections.emptyList());
   }
   
-  public void setWebhooks (List<Accessor> aWebhooks) {
+  public void setWebhooks (List<Webhook> aWebhooks) {
     set(DSL.WEBHOOKS,aWebhooks);
   }
   

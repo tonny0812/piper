@@ -26,6 +26,7 @@ import com.creactiviti.piper.core.DSL;
 import com.creactiviti.piper.core.MapObject;
 import com.creactiviti.piper.core.job.Job;
 import com.creactiviti.piper.core.job.JobRepository;
+import com.creactiviti.piper.core.job.Webhook;
 
 /**
  * 
@@ -51,7 +52,7 @@ public class TaskStartedWebhookEventListener implements  EventListener {
       logger.warn("Unknown job: {}", jobId);
       return;
     }
-    List<Accessor> webhooks = job.getWebhooks();
+    List<Webhook> webhooks = job.getWebhooks();
     for(Accessor webhook : webhooks) {
       if(Events.TASK_STARTED.equals(webhook.getRequiredString(DSL.TYPE))) {
         MapObject webhookEvent = new MapObject(webhook.asMap());

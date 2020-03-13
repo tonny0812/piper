@@ -133,7 +133,7 @@ public interface Job extends Errorable, Prioritizable {
    * 
    * @return {@link List}
    */
-  List<Accessor> getWebhooks ();
+  List<Webhook> getWebhooks ();
   
   Map<String,Object> asMap();
   
