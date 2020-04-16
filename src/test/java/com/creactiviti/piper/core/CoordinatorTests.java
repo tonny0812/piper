@@ -1,21 +1,6 @@
 
 package com.creactiviti.piper.core;
 
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
 import com.creactiviti.piper.core.context.JdbcContextRepository;
 import com.creactiviti.piper.core.job.JdbcJobRepository;
 import com.creactiviti.piper.core.job.Job;
@@ -23,19 +8,26 @@ import com.creactiviti.piper.core.job.JobStatus;
 import com.creactiviti.piper.core.messagebroker.Queues;
 import com.creactiviti.piper.core.messagebroker.SyncMessageBroker;
 import com.creactiviti.piper.core.pipeline.ResourceBasedPipelineRepository;
-import com.creactiviti.piper.core.task.DefaultTaskHandlerResolver;
-import com.creactiviti.piper.core.task.JdbcTaskExecutionRepository;
-import com.creactiviti.piper.core.task.SpelTaskEvaluator;
-import com.creactiviti.piper.core.task.TaskExecution;
-import com.creactiviti.piper.core.task.TaskHandler;
-import com.creactiviti.piper.core.task.WorkTaskDispatcher;
+import com.creactiviti.piper.core.task.*;
 import com.creactiviti.piper.taskhandler.io.Print;
 import com.creactiviti.piper.taskhandler.random.RandomInt;
 import com.creactiviti.piper.taskhandler.time.Sleep;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @SpringBootTest
 public class CoordinatorTests {

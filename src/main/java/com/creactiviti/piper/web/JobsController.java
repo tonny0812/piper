@@ -21,6 +21,8 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
@@ -40,29 +42,34 @@ import com.creactiviti.piper.core.job.Job;
 import com.creactiviti.piper.core.job.JobRepository;
 import com.creactiviti.piper.core.job.JobSummary;
 
+@Api(tags = {"Job作业"})
 @RestController
 @ConditionalOnCoordinator
 public class JobsController {
 
   @Autowired private JobRepository jobRepository;
   @Autowired private Coordinator coordinator;
-  
+
+  @ApiOperation(value = "Job作业列表")
   @GetMapping(value="/jobs")
   public Page<JobSummary> list (@RequestParam(value="p",defaultValue="1") Integer aPageNumber) {
     return jobRepository.getPage(aPageNumber);
   }
-  
+
+  @ApiOperation(value = "Job作业提交")
   @PostMapping("/jobs")
   public Job create (@RequestBody Map<String, Object> aJobRequest) {
     return coordinator.create(aJobRequest);
   }
-  
+
+  @ApiOperation(value = "Job作业信息")
   @GetMapping(value="/jobs/{id}")
   public Job get (@PathVariable("id")String aJobId) {
     Job job = jobRepository.getById (aJobId);
     return job;
   }
-  
+
+  @ApiOperation(value = "Job作业最新信息")
   @GetMapping(value="/jobs/latest")
   public Job latest () {
     Optional<Job> job = jobRepository.getLatest();
@@ -74,12 +81,14 @@ public class JobsController {
   public void handleIllegalArgumentException (HttpServletResponse aResponse) throws IOException {
     aResponse.sendError(HttpStatus.BAD_REQUEST.value());
   }
-  
+
+  @ApiOperation(value = "Job作业重启")
   @PutMapping(value="/jobs/{id}/restart")
   public Job restart (@PathVariable("id")String aJobId) {
     return coordinator.resume(aJobId);
   }
-  
+
+  @ApiOperation(value = "Job作业停止")
   @PutMapping(value="/jobs/{id}/stop")
   public Job step (@PathVariable("id")String aJobId) {
     return coordinator.stop(aJobId);
